@@ -1,0 +1,30 @@
+from flask import Flask, render_template, request, redirect, url_for
+
+app = Flask(__name__)
+
+SITE_NAME = "Grow a Garden Trading.com"
+
+# Sample data
+users = {
+    "alice": {"pets": ["Cat"], "seeds": ["Sunflower"], "fruits": ["Apple"]},
+    "bob": {"pets": ["Dog"], "seeds": ["Rose"], "fruits": ["Banana"]}
+}
+
+@app.route("/")
+def home():
+    return render_template("index.html", site_name=SITE_NAME, users=users)
+
+@app.route("/trade", methods=["POST"])
+def trade():
+    from_user = request.form["from_user"]
+    to_user = request.form["to_user"]
+    item_type = request.form["item_type"]
+    item = request.form["item"]
+    # Remove item from from_user and add to to_user
+    if item in users[from_user][item_type]:
+        users[from_user][item_type].remove(item)
+        users[to_user][item_type].append(item)
+    return redirect(url_for("home"))
+
+if __name__ == "__main__":
+    app.run(debug=True)
